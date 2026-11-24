@@ -8,6 +8,6 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = NoAutoDisableLPM
 NoAutoDisableLPM_FILES = Tweak.x
 NoAutoDisableLPM_CFLAGS = -fobjc-arc -Oz
-NoAutoDisableLPM_LDFLAGS = -Wl,-dead_strip
+NoAutoDisableLPM_LDFLAGS = -Wl,-dead_strip,-dead_strip_dylibs
 
 include $(THEOS_MAKE_PATH)/tweak.mk
