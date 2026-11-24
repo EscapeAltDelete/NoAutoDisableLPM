@@ -23,7 +23,6 @@ jobs:
             architecture: iphoneos-arm
             prefix: ''
     env:
-      THEOS: ${{ runner.temp }}/theos
       HOMEBREW_NO_AUTO_UPDATE: '1'
     defaults:
       run:
@@ -35,6 +34,8 @@ jobs:
 
       - name: Install Theos and SDK
         run: |
+          export THEOS="$RUNNER_TEMP/theos"
+          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
           brew install ldid xz dpkg make
           git clone --depth 1 --recursive https://github.com/theos/theos.git "$THEOS"
           mkdir -p "$THEOS/sdks"
