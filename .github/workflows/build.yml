@@ -69,7 +69,8 @@ jobs:
           base="$RUNNER_TEMP/package$PREFIX/Library/MobileSubstrate/DynamicLibraries/NoAutoDisableLPM"
           test -s "$base.dylib"
           test -s "$base.plist"
-          lipo -verify_arch arm64 arm64e "$base.dylib"
+          lipo "$base.dylib" -verify_arch arm64 arm64e
+          lipo "$base.dylib" -archs
           dpkg-deb -I "$deb"
           dpkg-deb -c "$deb"
 
