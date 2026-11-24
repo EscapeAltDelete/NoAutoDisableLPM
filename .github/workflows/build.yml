@@ -22,6 +22,9 @@ jobs:
           - scheme: rootful
             architecture: iphoneos-arm
             prefix: ''
+          - scheme: roothide
+            architecture: iphoneos-arm64e
+            prefix: ''
     env:
       HOMEBREW_NO_AUTO_UPDATE: '1'
     defaults:
@@ -33,11 +36,17 @@ jobs:
           persist-credentials: false
 
       - name: Install Theos and SDK
+        env:
+          SCHEME: ${{ matrix.scheme }}
         run: |
           export THEOS="$RUNNER_TEMP/theos"
           echo "THEOS=$THEOS" >> "$GITHUB_ENV"
           brew install ldid xz dpkg make
-          git clone --depth 1 --recursive https://github.com/theos/theos.git "$THEOS"
+          repo=theos/theos
+          if [[ "$SCHEME" == roothide ]]; then
+            repo=roothide/theos
+          fi
+          git clone --depth 1 --recursive "https://github.com/$repo.git" "$THEOS"
           mkdir -p "$THEOS/sdks"
           curl --fail --location --retry 3 --output "$RUNNER_TEMP/sdk.tar.xz" https://github.com/theos/sdks/releases/download/master-146e41f/iPhoneOS16.5.sdk.tar.xz
           tar -xJf "$RUNNER_TEMP/sdk.tar.xz" -C "$THEOS/sdks"
@@ -49,8 +58,8 @@ jobs:
           SCHEME: ${{ matrix.scheme }}
         run: |
           args=()
-          if [[ "$SCHEME" == rootless ]]; then
-            args+=(THEOS_PACKAGE_SCHEME=rootless)
+          if [[ "$SCHEME" != rootful ]]; then
+            args+=(THEOS_PACKAGE_SCHEME="$SCHEME")
           fi
           gmake -j2 package FINALPACKAGE=1 TARGET=iphone:clang:16.5:15.0 ARCHS='arm64 arm64e' "${args[@]}"
 
